@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>해장 맥모닝 뽑기</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:#DA291C; --red-dark:#B71C1C; --red-light:#FFEBEE;
+    --gold:#FFC72C; --gold-light:#FFF8E1; --gold-dark:#F9A825;
+    --green:#2E7D32; --green-light:#E8F5E9;
+    --bg:#FFFDF7; --surface:#fff; --border:rgba(0,0,0,.09);
+    --text:#1A1A1A; --muted:#757575; --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  header{background:var(--red);position:sticky;top:0;z-index:100;}
+  .hi{max-width:880px;margin:0 auto;padding:13px 20px;display:flex;align-items:center;gap:14px;}
+  .logo{width:44px;height:44px;background:var(--gold);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .ht{font-family:'Black Han Sans',sans-serif;font-size:21px;color:#fff;letter-spacing:-.3px;line-height:1;}
+  .hs{font-size:12px;color:rgba(255,255,255,.7);margin-top:3px;}
+
+  .tabs-bar{background:#C0231A;border-bottom:3px solid var(--gold);}
+  .tabs-inner{max-width:880px;margin:0 auto;display:flex;}
+  .tb{padding:10px 20px;font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;color:rgba(255,255,255,.55);background:transparent;border:none;border-bottom:3px solid transparent;margin-bottom:-3px;cursor:pointer;transition:all .18s;}
+  .tb.active{color:var(--gold);border-bottom-color:var(--gold);}
+  .tb:hover:not(.active){color:rgba(255,255,255,.9);}
+  .badge{display:inline-block;background:var(--gold);color:#7B2D00;font-size:10px;font-weight:700;padding:1px 5px;border-radius:20px;margin-left:4px;vertical-align:middle;}
+
+  main{max-width:880px;margin:0 auto;padding:22px 20px 60px;}
+  .panel{display:none;} .panel.active{display:block;}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
+  .chd{padding:13px 16px;background:#FAFAFA;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px;}
+  .chd-ico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+  .ico-r{background:var(--red-light);} .ico-g{background:var(--gold-light);}
+  .chd-tit{font-size:14px;font-weight:700;}
+  .chd-sub{font-size:12px;color:var(--muted);margin-left:auto;}
+  .cb{padding:14px 16px;}
+
+  .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;}
+  .mrow{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#FAFAFA;border:1px solid var(--border);border-radius:9px;transition:border-color .15s;}
+  .mrow:focus-within{border-color:var(--red);background:#fff;}
+  .mdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .minp{flex:1;border:none;background:transparent;font-family:'Noto Sans KR',sans-serif;font-size:13px;color:var(--text);outline:none;}
+
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:500px){.twocol{grid-template-columns:1fr;}}
+  .mslbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;}
+  .merow{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+  .meinp{flex:1;padding:6px 9px;border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans KR',sans-serif;font-size:13px;background:#FAFAFA;color:var(--text);transition:border-color .15s;}
+  .meinp:focus{outline:none;border-color:var(--red);background:#fff;}
+  .bdel{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s;}
+  .bdel:hover{background:var(--red-light);color:var(--red);border-color:#FFCDD2;}
+  .badd{width:100%;padding:6px;border:1px dashed var(--border);border-radius:8px;background:transparent;color:var(--muted);font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer;margin-top:2px;transition:all .12s;}
+  .badd:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
+
+  .notice{padding:11px 14px;background:var(--gold-light);border:1px solid #FFD54F;border-radius:9px;font-size:13px;color:#7B5800;margin-bottom:12px;}
+  .notice.done{background:var(--green-light);border-color:#A5D6A7;color:var(--green);}
+  .prow{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:12px;}
+  .pbg{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .pfill{height:100%;background:var(--red);border-radius:3px;transition:width .3s;}
+  .ogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:9px;}
+  .oc{background:var(--surface);border:1.5px solid var(--border);border-radius:11px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .12s;}
+  .oc:hover{border-color:var(--red);transform:translateY(-1px);}
+  .oc.done{border-color:#A5D6A7;}
+  .ochd{padding:9px 11px 7px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+  .ocav{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+  .ocname{font-size:13px;font-weight:700;}
+  .ocst{font-size:11px;color:var(--muted);margin-left:auto;}
+  .ocst.ok{color:var(--green);font-weight:700;}
+  .ocbd{padding:8px 11px 10px;}
+  .oclbl{font-size:10px;color:var(--muted);margin-bottom:2px;}
+  .ocval{font-size:12px;min-height:16px;}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:200;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border-radius:18px;width:100%;max-width:400px;overflow:hidden;animation:slideUp .24s ease;}
+  @keyframes slideUp{from{transform:translateY(28px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .mhd{background:var(--red);padding:15px 17px;display:flex;align-items:center;gap:11px;}
+  .mav{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--red);background:var(--gold);flex-shrink:0;}
+  .mname{font-size:17px;font-weight:700;color:#fff;}
+  .mhint{font-size:12px;color:rgba(255,255,255,.7);}
+  .mbody{padding:16px 17px;}
+  .msec{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+  .ogr{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:16px;}
+  .obtn{padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;background:#FAFAFA;font-family:'Noto Sans KR',sans-serif;font-size:12px;color:var(--text);cursor:pointer;text-align:left;transition:all .12s;line-height:1.3;}
+  .obtn:hover{border-color:var(--red);background:var(--red-light);color:var(--red-dark);}
+  .obtn.sd{border-color:var(--gold-dark);background:var(--gold-light);color:#7B5800;font-weight:700;}
+  .obtn.sf{border-color:#66BB6A;background:var(--green-light);color:var(--green);font-weight:700;}
+  .mft{padding:0 17px 17px;display:flex;gap:8px;}
+  .bsave{flex:1;padding:11px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'Black Han Sans',sans-serif;font-size:15px;letter-spacing:.3px;cursor:pointer;transition:background .15s;}
+  .bsave:hover{background:var(--red-dark);}
+  .bsave:disabled{opacity:.38;cursor:not-allowed;}
+  .bcancel{padding:11px 15px;background:#F5F5F5;color:var(--muted);border:none;border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
+  .bcancel:hover{background:#EEE;}
+
+  .gctrl{display:flex;gap:9px;align-items:center;margin-bottom:13px;flex-wrap:wrap;}
+  .bprimary{padding:10px 22px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'Black Han Sans',sans-serif;font-size:16px;letter-spacing:.4px;cursor:pointer;transition:all .15s;}
+  .bprimary:hover{background:var(--red-dark);transform:translateY(-1px);}
+  .bprimary:active{transform:scale(.97);}
+  .bprimary:disabled{opacity:.38;cursor:not-allowed;transform:none;}
+  .bsec{padding:10px 15px;background:#fff;color:var(--text);border:1px solid var(--border);border-radius:10px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;transition:all .12s;}
+  .bsec:hover{border-color:var(--red);color:var(--red);}
+  .spd{display:flex;align-items:center;gap:7px;margin-left:auto;font-size:12px;color:var(--muted);}
+  .spd input{width:78px;accent-color:var(--red);}
+  canvas{display:block;width:100%;border:1px solid var(--border);border-radius:var(--radius);background:#FAFAFA;}
+
+  .rbanner{background:var(--red);border-radius:14px;padding:15px 18px;display:flex;align-items:center;gap:14px;margin-bottom:14px;animation:popIn .4s cubic-bezier(.175,.885,.32,1.275);}
+  @keyframes popIn{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+  .rlogo{width:48px;height:48px;background:var(--gold);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .rname{font-family:'Black Han Sans',sans-serif;font-size:24px;color:var(--gold);letter-spacing:.5px;}
+  .rsub{font-size:13px;color:rgba(255,255,255,.85);margin-top:2px;}
+  .rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:8px;}
+  .rc{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:10px 11px;animation:fadeUp .35s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .rc.payer{background:var(--red);border-color:var(--red-dark);}
+  .rcav{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-bottom:5px;}
+  .rcname{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;}
+  .rcdrink{font-size:11px;color:#7B5800;}
+  .rcfood{font-size:11px;color:var(--green);margin-top:1px;}
+  .rc.payer .rcname{color:#fff;}
+  .rc.payer .rcdrink{color:var(--gold);font-weight:700;font-size:12px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hi">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <path d="M3 19 Q6.5 7 14 7 Q21.5 7 25 19 Z" fill="#DA291C"/>
+        <rect x="3" y="18" width="22" height="4" rx="2" fill="#DA291C"/>
+        <rect x="4" y="22" width="20" height="3" rx="1.5" fill="#B71C1C"/>
+        <ellipse cx="14" cy="6.5" rx="3" ry="3.5" fill="#F9A825"/>
+        <ellipse cx="8" cy="8.5" rx="2.5" ry="3" fill="#F9A825"/>
+        <ellipse cx="20" cy="8.5" rx="2.5" ry="3" fill="#F9A825"/>
+      </svg>
+    </div>
+    <div>
+      <div class="ht">해장 맥모닝 뽑기</div>
+      <div class="hs">회식 다음날 아침 — 사다리로 계산자 결정!</div>
+    </div>
+  </div>
+</header>
+
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <button class="tb active" onclick="goTab('setup')">메뉴 설정</button>
+    <button class="tb" onclick="goTab('order')">개인 주문 <span class="badge" id="badge">0/14</span></button>
+    <button class="tb" onclick="goTab('game')">사다리 게임</button>
+  </div>
+</div>
+
+<main>
+  <div class="panel active" id="panel-setup">
+    <div class="card">
+      <div class="chd"><div class="chd-ico ico-r">👥</div><div class="chd-tit">참여 멤버 14명</div><div class="chd-sub">이름 수정 가능</div></div>
+      <div class="cb"><div class="mgrid" id="mgrid"></div></div>
+    </div>
+    <div class="card">
+      <div class="chd"><div class="chd-ico ico-g">🍽️</div><div class="chd-tit">메뉴 선택지 편집</div><div class="chd-sub">팀원이 고를 수 있는 메뉴</div></div>
+      <div class="cb">
+        <div class="twocol">
+          <div><div class="mslbl">☕ 음료 메뉴</div><div id="dlist"></div><button class="badd" onclick="addMenu('d')">+ 음료 추가</button></div>
+          <div><div class="mslbl">🍔 식사 메뉴</div><div id="flist"></div><button class="badd" onclick="addMenu('f')">+ 식사 추가</button></div>
+        </div>
+      </div>
+    </div>
+    <button class="bprimary" style="width:100%;padding:13px;font-size:17px" onclick="goTab('order')">개인 주문 입력하기 →</button>
+  </div>
+
+  <div class="panel" id="panel-order">
+    <div class="notice" id="notice">각 이름 카드를 눌러 음료와 식사 메뉴를 선택해주세요.</div>
+    <div class="prow"><span id="ptext">0 / 14명 완료</span><div class="pbg"><div class="pfill" id="pfill" style="width:0%"></div></div></div>
+    <div class="ogrid" id="ogrid"></div>
+    <div style="margin-top:14px"><button class="bprimary" style="width:100%;padding:13px;font-size:17px" onclick="goToGame()">사다리 게임 시작 →</button></div>
+  </div>
+
+  <div class="panel" id="panel-game">
+    <div id="cooldown-box" style="display:none;padding:14px 16px;background:#FFF8E1;border:1px solid #FFD54F;border-radius:12px;margin-bottom:14px;display:flex;align-items:center;gap:12px;">
+      <div style="width:36px;height:36px;background:#FFC72C;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;">⏳</div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:#7B5800;">아직 돌릴 수 없어요</div>
+        <div style="font-size:12px;color:#A0803A;margin-top:2px;">1시간에 1번만 뽑을 수 있습니다. <span id="cooldown-remain" style="font-weight:700;color:#E65100;"></span> 후 가능해요.</div>
+      </div>
+    </div>
+    <div class="gctrl">
+      <button class="bprimary" id="btn-run" onclick="runLadder()">사다리 돌리기!</button>
+      <button class="bsec" id="btn-retry" style="display:none" onclick="resetGame()">다시 뽑기</button>
+      <div class="spd">속도 <input type="range" min="1" max="5" value="3" step="1" oninput="spd=+this.value"></div>
+    </div>
+    <canvas id="cv"></canvas>
+    <div id="rwrap" style="display:none;margin-top:18px"></div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="mhd">
+      <div class="mav" id="mav"></div>
+      <div><div class="mname" id="mname"></div><div class="mhint">음료와 식사를 각각 하나씩 선택해주세요</div></div>
+    </div>
+    <div class="mbody">
+      <div class="msec">☕ 음료 선택</div><div class="ogr" id="mdrinkopts"></div>
+      <div class="msec">🍔 식사 선택</div><div class="ogr" id="mfoodopts"></div>
+    </div>
+    <div class="mft">
+      <button class="bcancel" onclick="closeModal()">취소</button>
+      <button class="bsave" id="bsave" onclick="saveOrder()" disabled>주문 저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+let names = ['이정익','하준식','조인관','정신욱','신재희','박정민','강석중','최형진','서연지','유태권','김현우','임정은','박민기','신재문'];
+let drinks = ['아이스커피','핫커피','콜라','제로콜라'];
+let foods  = ['베이컨토마토에그','에그맥머핀','치킨치즈','베이컨에그','소시지에그','핫케익'];
+const PAL = ['#DA291C','#1565C0','#2E7D32','#6A1B9A','#E65100','#00695C','#4527A0','#AD1457','#1A237E','#37474F','#BF360C','#1B5E20','#880E4F','#006064'];
+
+let orders = names.map(() => ({ drink: null, food: null }));
+let mIdx = -1, mDrink = null, mFood = null;
+let spd = 3, ld = null, af = null;
+
+// ── COOLDOWN (1시간 = 3600초) ──
+const COOLDOWN_MS = 60 * 60 * 1000;
+const LS_KEY = 'mcmorning_last_run';
+let cdTimer = null;
+
+function getLastRun() {
+  try { return parseInt(localStorage.getItem(LS_KEY) || '0', 10); } catch(e) { return 0; }
+}
+function setLastRun() {
+  try { localStorage.setItem(LS_KEY, Date.now().toString()); } catch(e) {}
+}
+function remainMs() {
+  const elapsed = Date.now() - getLastRun();
+  return Math.max(0, COOLDOWN_MS - elapsed);
+}
+function fmtRemain(ms) {
+  const totalSec = Math.ceil(ms / 1000);
+  const m = Math.floor(totalSec / 60), s = totalSec % 60;
+  return m > 0 ? `${m}분 ${s}초` : `${s}초`;
+}
+function updateCooldownUI() {
+  const rem = remainMs();
+  const box = document.getElementById('cooldown-box');
+  const btn = document.getElementById('btn-run');
+  if (rem > 0) {
+    box.style.display = 'flex';
+    btn.disabled = true;
+    document.getElementById('cooldown-remain').textContent = fmtRemain(rem);
+    if (!cdTimer) cdTimer = setInterval(() => {
+      const r = remainMs();
+      if (r <= 0) {
+        clearInterval(cdTimer); cdTimer = null;
+        box.style.display = 'none';
+        btn.disabled = false;
+        document.getElementById('cooldown-remain').textContent = '';
+      } else {
+        document.getElementById('cooldown-remain').textContent = fmtRemain(r);
+      }
+    }, 1000);
+  } else {
+    box.style.display = 'none';
+    btn.disabled = false;
+  }
+}
+
+// ── TABS ──
+function goTab(t) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tb').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + t).classList.add('active');
+  ['setup','order','game'].forEach((id, i) => {
+    if (id === t) document.querySelectorAll('.tb')[i].classList.add('active');
+  });
+  if (t === 'game') { initCanvas(); updateCooldownUI(); }
+}
+function goToGame() {
+  const done = orders.filter(o => o.drink && o.food).length;
+  if (done < names.length && !confirm(names.length - done + '명이 아직 미선택이에요. 계속할까요?')) return;
+  goTab('game');
+}
+
+// ── SETUP ──
+function renderSetup() {
+  const g = document.getElementById('mgrid'); g.innerHTML = '';
+  names.forEach((n, i) => {
+    const row = document.createElement('div'); row.className = 'mrow';
+    const dot = document.createElement('span'); dot.className = 'mdot'; dot.style.background = PAL[i % PAL.length];
+    const inp = document.createElement('input'); inp.className = 'minp'; inp.value = n;
+    inp.oninput = e => { names[i] = e.target.value; renderOrderGrid(); };
+    const del = document.createElement('button'); del.className = 'bdel'; del.textContent = '×';
+    del.title = '멤버 삭제';
+    del.onclick = () => {
+      names.splice(i, 1);
+      orders.splice(i, 1);
+      renderSetup(); renderOrderGrid();
+    };
+    row.appendChild(dot); row.appendChild(inp); row.appendChild(del); g.appendChild(row);
+  });
+  // 멤버 추가 버튼
+  const addBtn = document.createElement('button');
+  addBtn.className = 'badd';
+  addBtn.style.gridColumn = '1 / -1';
+  addBtn.textContent = '+ 멤버 추가';
+  addBtn.onclick = () => {
+    names.push('');
+    orders.push({ drink: null, food: null });
+    renderSetup(); renderOrderGrid();
+  };
+  g.appendChild(addBtn);
+  renderML('dlist', drinks, 'd');
+  renderML('flist', foods, 'f');
+}
+function renderML(id, arr, type) {
+  const el = document.getElementById(id); el.innerHTML = '';
+  arr.forEach((m, i) => {
+    const row = document.createElement('div'); row.className = 'merow';
+    const inp = document.createElement('input'); inp.className = 'meinp'; inp.value = m;
+    inp.oninput = e => arr[i] = e.target.value;
+    const del = document.createElement('button'); del.className = 'bdel'; del.textContent = '×';
+    del.onclick = () => { arr.splice(i, 1); renderML(id, arr, type); };
+    row.appendChild(inp); row.appendChild(del); el.appendChild(row);
+  });
+}
+function addMenu(t) {
+  if (t === 'd') { drinks.push(''); renderML('dlist', drinks, 'd'); }
+  else { foods.push(''); renderML('flist', foods, 'f'); }
+}
+
+// ── ORDER ──
+function renderOrderGrid() {
+  const g = document.getElementById('ogrid'); g.innerHTML = '';
+  names.forEach((n, i) => {
+    const o = orders[i], done = !!(o.drink && o.food);
+    const c = document.createElement('div'); c.className = 'oc' + (done ? ' done' : '');
+    c.onclick = () => openModal(i);
+    c.innerHTML = `<div class="ochd"><div class="ocav" style="background:${PAL[i%PAL.length]}">${n.charAt(0)}</div><div class="ocname">${n}</div><div class="ocst${done?' ok':''}">${done?'완료':'미선택'}</div></div><div class="ocbd"><div class="oclbl">음료</div><div class="ocval" style="color:${o.drink?'#7B5800':'var(--muted)'}">${o.drink||'—'}</div><div class="oclbl" style="margin-top:4px">식사</div><div class="ocval" style="color:${o.food?'var(--green)':'var(--muted)'}">${o.food||'—'}</div></div>`;
+    g.appendChild(c);
+  });
+  const done = orders.filter(o => o.drink && o.food).length, total = names.length;
+  document.getElementById('badge').textContent = done + '/' + total;
+  document.getElementById('ptext').textContent = done + ' / ' + total + '명 완료';
+  document.getElementById('pfill').style.width = Math.round(done / total * 100) + '%';
+  const n = document.getElementById('notice');
+  if (done === total) { n.className = 'notice done'; n.textContent = '모든 주문 완료! 사다리 게임으로 넘어가세요.'; }
+  else { n.className = 'notice'; n.textContent = '각 이름 카드를 눌러 음료와 식사 메뉴를 선택해주세요.'; }
+}
+
+// ── MODAL ──
+function openModal(idx) {
+  mIdx = idx; mDrink = orders[idx].drink; mFood = orders[idx].food;
+  const n = names[idx];
+  document.getElementById('mav').textContent = n.charAt(0);
+  document.getElementById('mav').style.background = PAL[idx % PAL.length];
+  document.getElementById('mname').textContent = n + '님';
+  renderOpts();
+  document.getElementById('overlay').classList.add('open');
+}
+function renderOpts() {
+  const dg = document.getElementById('mdrinkopts'), fg = document.getElementById('mfoodopts');
+  dg.innerHTML = ''; fg.innerHTML = '';
+  drinks.forEach(m => {
+    const b = document.createElement('button'); b.className = 'obtn' + (m === mDrink ? ' sd' : ''); b.textContent = m;
+    b.onclick = () => { mDrink = m; renderOpts(); };
+    dg.appendChild(b);
+  });
+  foods.forEach(m => {
+    const b = document.createElement('button'); b.className = 'obtn' + (m === mFood ? ' sf' : ''); b.textContent = m;
+    b.onclick = () => { mFood = m; renderOpts(); };
+    fg.appendChild(b);
+  });
+  document.getElementById('bsave').disabled = !(mDrink && mFood);
+}
+function saveOrder() {
+  if (!mDrink || !mFood) return;
+  orders[mIdx] = { drink: mDrink, food: mFood };
+  closeModal(); renderOrderGrid();
+}
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+function overlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
+
+// ──────────────────────────────────────────────────
+// LADDER CORE — fixed random distribution
+//
+// Design:
+//   • person i starts at column i (top)
+//   • trace(i) → bottom column person i arrives at
+//   • bottom column 0 is fixed as PAY slot
+//   • payer = the person whose trace lands on column 0
+//   • This is computed ONCE after animation ends, using
+//     the same ld that was animated — no re-randomisation.
+// ──────────────────────────────────────────────────
+function buildLadder(n) {
+  const rows = Math.max(24, n * 4), rungs = [];
+  for (let r = 0; r < rows; r++) {
+    let prev = -2;
+    for (let c = 0; c < n - 1; c++) {
+      if (c > prev + 1 && Math.random() < 0.40) { rungs.push({ r, c }); prev = c; }
+    }
+  }
+  return { n, rows, rungs };
+}
+
+// Trace a single person from startCol to their bottom column
+function tracePerson(myLd, startCol) {
+  let col = startCol;
+  for (let r = 0; r < myLd.rows; r++) {
+    const right = myLd.rungs.some(x => x.r === r && x.c === col);
+    const left  = myLd.rungs.some(x => x.r === r && x.c === col - 1);
+    if (right) col++;
+    else if (left) col--;
+  }
+  return col;
+}
+
+// Bottom column labels: col 0 = PAY, rest = drink names
+function bottomLabel(col) {
+  if (col === 0) return '__PAY__';
+  const d = drinks[col - 1];
+  return d !== undefined ? d : drinks[(col - 1) % drinks.length];
+}
+
+// ── CANVAS ──
+const PAD = { t:44, b:44, l:14, r:14 };
+let ctx, W, H, colW, rowH;
+
+function initCanvas() {
+  const cv = document.getElementById('cv');
+  W = cv.parentElement.clientWidth || 700;
+  H = Math.min(560, Math.max(400, W * 0.85));
+  cv.width = W * devicePixelRatio; cv.height = H * devicePixelRatio;
+  cv.style.height = H + 'px';
+  ctx = cv.getContext('2d'); ctx.scale(devicePixelRatio, devicePixelRatio);
+  if (!ld) ld = buildLadder(names.length);
+  colW = (W - PAD.l - PAD.r) / (ld.n - 1);
+  rowH = (H - PAD.t - PAD.b) / ld.rows;
+  drawBase();
+}
+const cx = c => PAD.l + c * colW;
+const ry = r => PAD.t + r * rowH;
+
+function drawBase(hiPayerCol) {
+  ctx.clearRect(0, 0, W, H);
+  const hi = hiPayerCol !== undefined;
+
+  // verticals
+  for (let c = 0; c < ld.n; c++) {
+    ctx.beginPath();
+    ctx.strokeStyle = PAL[c % PAL.length];
+    ctx.lineWidth = (hi && c === hiPayerCol) ? 3 : 1.5;
+    ctx.globalAlpha = hi ? (c === hiPayerCol ? 0.85 : 0.1) : 0.24;
+    ctx.moveTo(cx(c), PAD.t); ctx.lineTo(cx(c), H - PAD.b);
+    ctx.stroke(); ctx.globalAlpha = 1;
+  }
+  // rungs
+  ld.rungs.forEach(({ r, c }) => {
+    ctx.beginPath(); ctx.strokeStyle = '#BDBDBD'; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.5;
+    ctx.moveTo(cx(c), ry(r + 0.5)); ctx.lineTo(cx(c + 1), ry(r + 0.5));
+    ctx.stroke(); ctx.globalAlpha = 1;
+  });
+  // top: name labels
+  names.forEach((n, i) => {
+    const lbl = n.length > 3 ? n.slice(0, 3) + '..' : n;
+    ctx.save(); ctx.font = "bold 11px 'Noto Sans KR',sans-serif";
+    ctx.fillStyle = PAL[i % PAL.length]; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(lbl, cx(i), 20); ctx.restore();
+  });
+  // bottom: fixed slot labels (col 0 = PAY, col 1..n-1 = drink names)
+  for (let c = 0; c < ld.n; c++) {
+    const m = bottomLabel(c);
+    const isPay = m === '__PAY__';
+    const lbl = isPay ? '쏘는 사람' : (m.length > 5 ? m.slice(0, 5) + '..' : m);
+    ctx.save(); ctx.font = (isPay ? 'bold' : 'normal') + " 11px 'Noto Sans KR',sans-serif";
+    ctx.fillStyle = isPay ? '#DA291C' : '#888'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(lbl, cx(c), H - 20); ctx.restore();
+  }
+}
+
+// ── ANIMATION ──
+let tracers = [];
+
+function runLadder() {
+  if (remainMs() > 0) { updateCooldownUI(); return; }
+  setLastRun();
+  updateCooldownUI();
+  document.getElementById('btn-run').disabled = true;
+  document.getElementById('btn-retry').style.display = 'none';
+  document.getElementById('rwrap').style.display = 'none';
+  if (af) cancelAnimationFrame(af);
+  ld = buildLadder(names.length);
+  initCanvas();
+  tracers = names.map((_, i) => ({ startCol: i, col: i, row: 0, done: false }));
+  animStep();
+}
+
+function animStep() {
+  const steps = Math.ceil(spd * 0.9);
+  for (let s = 0; s < steps; s++) {
+    tracers.forEach(t => {
+      if (t.done) return;
+      if (t.row >= ld.rows) { t.done = true; return; }
+      const right = ld.rungs.some(x => x.r === t.row && x.c === t.col);
+      const left  = ld.rungs.some(x => x.r === t.row && x.c === t.col - 1);
+      if (right) t.col++;
+      else if (left) t.col--;
+      t.row++;
+    });
+  }
+
+  drawBase();
+  tracers.forEach(t => {
+    if (!t.done) {
+      ctx.beginPath(); ctx.arc(cx(t.col), ry(t.row), 5, 0, Math.PI * 2);
+      ctx.fillStyle = PAL[t.startCol % PAL.length]; ctx.globalAlpha = 0.88;
+      ctx.fill(); ctx.globalAlpha = 1;
+    }
+  });
+
+  if (!tracers.every(t => t.done)) { af = requestAnimationFrame(animStep); }
+  else { finalize(); }
+}
+
+function finalize() {
+  // Compute each person's final bottom column using the SAME ld (no rebuild!)
+  // bottomCols[personIdx] = bottom column that person reached
+  const bottomCols = names.map((_, i) => tracePerson(ld, i));
+
+  // Payer = person whose bottom column is 0 (PAY slot)
+  const payerIdx = bottomCols.indexOf(0);
+
+  // Highlight the PAY column (column index 0 at bottom)
+  drawBase(0);
+
+  // Draw final dots
+  tracers.forEach(t => {
+    const isPayer = (t.startCol === payerIdx);
+    ctx.beginPath(); ctx.arc(cx(t.col), ry(ld.rows), isPayer ? 8 : 5, 0, Math.PI * 2);
+    ctx.fillStyle = isPayer ? '#DA291C' : PAL[t.startCol % PAL.length];
+    ctx.globalAlpha = isPayer ? 1 : 0.6; ctx.fill(); ctx.globalAlpha = 1;
+  });
+
+  showResult(payerIdx);
+  // 쿨다운 중이므로 다시뽑기 숨김
+  document.getElementById('btn-retry').style.display = 'none';
+}
+
+function showResult(payerIdx) {
+  const pName = names[payerIdx];
+  let html = `<div class="rbanner"><div class="rlogo"><svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M4 22 Q8 9 16 9 Q24 9 28 22 Z" fill="#DA291C"/><rect x="4" y="21" width="24" height="4" rx="2" fill="#DA291C"/><rect x="5" y="25" width="22" height="3" rx="1.5" fill="#B71C1C"/><ellipse cx="16" cy="8" rx="3.5" ry="4" fill="#B71C1C"/><ellipse cx="9.5" cy="10" rx="2.5" ry="3" fill="#B71C1C"/><ellipse cx="22.5" cy="10" rx="2.5" ry="3" fill="#B71C1C"/></svg></div><div><div class="rname">${pName}</div><div class="rsub">오늘 맥모닝을 쏩니다!</div></div></div><div class="rgrid">`;
+  names.forEach((n, i) => {
+    const isPayer = i === payerIdx;
+    html += `<div class="rc${isPayer?' payer':''}" style="animation-delay:${(i*0.04).toFixed(2)}s">
+      <div class="rcav" style="background:${PAL[i%PAL.length]}">${n.charAt(0)}</div>
+      <div class="rcname">${n}</div>
+      <div class="rcdrink">${isPayer ? '맥모닝 당첨!' : '꽝'}</div>
+    </div>`;
+  });
+  html += '</div>';
+  const rw = document.getElementById('rwrap');
+  rw.innerHTML = html; rw.style.display = 'block';
+}
+
+function resetGame() {
+  if (remainMs() > 0) { updateCooldownUI(); return; }
+  if (af) cancelAnimationFrame(af);
+  document.getElementById('btn-run').disabled = false;
+  document.getElementById('btn-retry').style.display = 'none';
+  document.getElementById('rwrap').style.display = 'none';
+  ld = buildLadder(names.length);
+  initCanvas();
+}
+
+// ── INIT ──
+renderSetup();
+renderOrderGrid();
+window.addEventListener('resize', () => {
+  if (document.getElementById('panel-game').classList.contains('active')) initCanvas();
+});
+</script>
+</body>
+</html>
